@@ -136,13 +136,39 @@ export async function probe(url: string, opts: ProbeOptions = {}): Promise<Check
   {
     const foreign = opts.foreignOrigin ?? "https://mcp-http-probe.invalid";
     const r = await send("POST", rpc("initialize", initParams), { origin: foreign }, false);
-    ok(r.status === 403, "MUST", "origin-validation", `Rejects a foreign Origin (${foreign}) with 403`, REF.security, `got HTTP ${r.status}`);
+    if (r.status === 401) {
+      add({ id: "origin-validation", level: "MUST", title: `Rejects a foreign Origin (${foreign}) with 403`, status: "skip", ref: REF.security, detail: "inconclusive: server demanded auth first (pass a token with -H to test)" });
+    } else {
+      ok(r.status === 403, "MUST", "origin-validation", `Rejects a foreign Origin (${foreign}) with 403`, REF.security, `got HTTP ${r.status}`);
+    }
     const sid = r.headers.get("mcp-session-id");
     if (sid) await send("DELETE", undefined, { "mcp-session-id": sid }, false).catch(() => {});
   }
 
   // ---- 3. Initialize ------------------------------------------------------
   const init = await send("POST", rpc("initialize", initParams), {}, false);
+  if (init.status === 401 || init.status === 403) {
+    // Report what an OAuth-capable client would discover, then stop: everything else needs a token.
+    const prmUrl = new URL("/.well-known/oauth-protected-resource", url);
+    const prm = await f(prmUrl).then(async (r) => (r.ok ? r.json() : null)).catch(() => null);
+    add({
+      id: "auth-required",
+      level: "INFO",
+      title: `Server requires authorization (HTTP ${init.status}); re-run with -H "Authorization: Bearer <token>"`,
+      status: "skip",
+      ref: `${T}/basic/authorization`,
+      detail: init.headers.get("www-authenticate") ?? "no WWW-Authenticate header",
+    });
+    add({
+      id: "protected-resource-metadata",
+      level: "SHOULD",
+      title: "Publishes OAuth Protected Resource Metadata (RFC 9728)",
+      status: prm?.resource && Array.isArray(prm?.authorization_servers) ? "pass" : "warn",
+      ref: `${T}/basic/authorization#authorization-server-discovery`,
+      detail: prm ? JSON.stringify(prm) : `nothing at ${prmUrl}`,
+    });
+    return results;
+  }
   const initOk = init.status === 200 && init.message?.result;
   ok(Boolean(initOk), "MUST", "initialize", "initialize succeeds over POST", REF.lifecycle, `HTTP ${init.status} ${init.body.slice(0, 200)}`);
   if (!initOk) return results;

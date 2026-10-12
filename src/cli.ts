@@ -49,7 +49,7 @@ if (json) {
   console.log(`\n${c(1, "mcp-http-probe")} ${url}  ${c(90, `(spec ${SPEC_VERSION})`)}\n`);
   for (const r of results) {
     console.log(`${icon[r.status]} ${c(90, r.level.padEnd(6))} ${r.title}`);
-    if (r.detail && r.status !== "pass") console.log(`         ${c(90, r.detail)}`);
+    if (r.detail && (r.status === "fail" || r.status === "warn")) console.log(`         ${c(90, r.detail)}`);
     if (r.status === "fail") console.log(`         ${c(90, r.ref)}`);
   }
   console.log(`\n${s.passed} passed, ${s.failed} failed, ${s.warnings} warnings\n`);

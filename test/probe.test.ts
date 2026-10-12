@@ -114,6 +114,22 @@ describe("probe", () => {
     assert.equal(byId(rs, "get-stream"), "fail");
   });
 
+  test("stops politely at an auth wall and reports discovery metadata", async () => {
+    const server = createServer((req, res) => {
+      if (req.url === "/.well-known/oauth-protected-resource") {
+        res.setHeader("content-type", "application/json");
+        return res.end(JSON.stringify({ resource: "http://x/mcp", authorization_servers: ["http://x"] }));
+      }
+      res.statusCode = 401;
+      res.end();
+    });
+    servers.push(server);
+    const rs = await probe(await listen(server));
+    assert.equal(byId(rs, "auth-required"), "skip");
+    assert.equal(byId(rs, "protected-resource-metadata"), "pass");
+    assert.equal(summarize(rs).failed, 0);
+  });
+
   test("reports an unreachable server instead of throwing", async () => {
     const rs = await probe("http://127.0.0.1:1/mcp", { timeoutMs: 500 });
     assert.equal(rs[0].id, "reachable");
