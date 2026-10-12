@@ -111,7 +111,7 @@ export async function probe(url: string, opts: ProbeOptions = {}): Promise<Check
     }
   }
   const rpc = (method: string, params?: unknown) => ({ jsonrpc: "2.0", id: nextId++, method, ...(params === undefined ? {} : { params }) });
-  const initParams = { protocolVersion: SPEC_VERSION, capabilities: {}, clientInfo: { name: "mcp-http-probe", version: "0.1.0" } };
+  const initParams = { protocolVersion: SPEC_VERSION, capabilities: {}, clientInfo: { name: "mcp-http-probe", version: "1.0.0" } };
 
   // ---- 1. Accept header enforcement (before we have a session) ----------
   try {
