@@ -81,4 +81,4 @@ npm test         # runs against a reference SDK server, an origin-unsafe server 
 npm run build    # emits dist/
 ```
 
-MIT licensed. It began as part of [Hearth](../../README.md), an Alexa+ caregiving MCP server, for the Amazon *Build, Ship, Shape* hackathon.
+MIT licensed. It began as part of [Hearth](https://github.com/Chinmay-92/hearth), an Alexa+ caregiving MCP server, for the Amazon *Build, Ship, Shape* hackathon.
