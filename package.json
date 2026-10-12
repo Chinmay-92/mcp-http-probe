@@ -1,6 +1,6 @@
 {
   "name": "mcp-http-probe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Conformance probe for MCP servers speaking the Streamable HTTP transport (spec 2025-11-25).",
   "type": "module",
   "license": "MIT",
