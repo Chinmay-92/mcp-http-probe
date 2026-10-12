@@ -1,0 +1,22 @@
+{
+  "name": "mcp-http-probe",
+  "version": "0.1.0",
+  "description": "Conformance probe for MCP servers speaking the Streamable HTTP transport (spec 2025-11-25).",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "mcp-http-probe": "dist/cli.js" },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "keywords": ["mcp", "model-context-protocol", "conformance", "streamable-http", "testing"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "node --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "express": "^5.1.0",
+    "zod": "^3.25.76"
+  }
+}
