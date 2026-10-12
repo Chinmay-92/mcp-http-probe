@@ -28,7 +28,7 @@
     "build": "tsc -p tsconfig.build.json",
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc -p .",
-    "prepublishOnly": "npm run build"
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
