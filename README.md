@@ -1,5 +1,10 @@
 # mcp-http-probe
 
+[![npm](https://img.shields.io/npm/v/mcp-http-probe?color=e46a2e)](https://www.npmjs.com/package/mcp-http-probe)
+[![ci](https://github.com/Chinmay-92/mcp-http-probe/actions/workflows/ci.yml/badge.svg)](https://github.com/Chinmay-92/mcp-http-probe/actions/workflows/ci.yml)
+[![MCP spec](https://img.shields.io/badge/MCP-2025--11--25-4a78a8)](https://modelcontextprotocol.io/specification/2025-11-25)
+[![license](https://img.shields.io/github/license/Chinmay-92/mcp-http-probe)](LICENSE)
+
 Black-box conformance checks for [Model Context Protocol](https://modelcontextprotocol.io) servers that use the **Streamable HTTP** transport, spec revision **2025-11-25**.
 
 Point it at any MCP endpoint. It runs 20+ checks taken from the transport, lifecycle, session, security and tools sections of the spec, then tells you what is broken and links to the rule.
@@ -60,11 +65,33 @@ It runs in CI in about a second and needs no SDK, so it works for servers writte
 | `get-stream` | MUST | GET → SSE stream or 405 |
 | `session-delete`, `session-terminated` | SHOULD/MUST | DELETE ends the session; later requests → 404 |
 
-The exit code is `1` if any MUST check fails, or any SHOULD check with `--strict`. That makes it easy to drop into CI:
+The exit code is `1` if any MUST check fails, or any SHOULD check with `--strict`.
+
+## GitHub Action
+
+Gate pull requests on spec conformance. The action writes a results table to the job summary and annotates failures.
 
 ```yaml
-- run: node server.js & npx wait-on tcp:8787 && npx mcp-http-probe http://127.0.0.1:8787/mcp --strict
+- run: node server.js &            # start your MCP server
+- uses: Chinmay-92/mcp-http-probe@v1
+  with:
+    url: http://127.0.0.1:8787/mcp
+    strict: true                   # also fail on SHOULD warnings
+    headers: |
+      Authorization: Bearer ${{ secrets.MCP_TEST_TOKEN }}
 ```
+
+Outputs: `passed`, `failed`, `warnings`.
+
+Or use the CLI directly in any CI system:
+
+```bash
+npx mcp-http-probe http://127.0.0.1:8787/mcp --strict
+```
+
+## A server that passes
+
+[`examples/reference-server.ts`](examples/reference-server.ts) is about 40 lines on the official TypeScript SDK and passes every check in `--strict` mode, including the Origin validation that the SDK leaves off by default. Copy it as a starting point.
 
 ## Library use
 

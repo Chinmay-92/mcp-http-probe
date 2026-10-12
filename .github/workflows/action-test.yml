@@ -1,0 +1,23 @@
+name: action self-test
+on: [push, pull_request]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install && npm run build
+      - name: Start reference server
+        run: |
+          node examples/reference-server.ts &
+          for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8787/mcp && break; sleep 0.5; done
+      - name: Probe it with this action
+        id: probe
+        uses: ./
+        with:
+          url: http://127.0.0.1:8787/mcp
+          strict: "true"
+          cli: dist/cli.js
+      - run: test "${{ steps.probe.outputs.failed }}" = "0"

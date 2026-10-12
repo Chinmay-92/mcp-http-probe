@@ -1,0 +1,68 @@
+name: MCP HTTP Probe
+description: Check an MCP server against the Streamable HTTP transport rules of spec 2025-11-25 (Origin/DNS rebinding, sessions, protocol version, tool schemas).
+author: Chinmay Pingale
+branding:
+  icon: check-circle
+  color: orange
+inputs:
+  url:
+    description: MCP endpoint to probe, e.g. http://127.0.0.1:8787/mcp
+    required: true
+  headers:
+    description: 'Extra request headers, one "Name: value" per line (e.g. an Authorization header from a secret)'
+    required: false
+    default: ""
+  strict:
+    description: Fail on SHOULD warnings as well as MUST failures
+    required: false
+    default: "false"
+  timeout:
+    description: Per-request timeout in milliseconds
+    required: false
+    default: "10000"
+  version:
+    description: mcp-http-probe version from npm
+    required: false
+    default: latest
+  cli:
+    description: Path to a local build of the CLI (dist/cli.js) instead of npm; used to test the action itself
+    required: false
+    default: ""
+outputs:
+  passed:
+    description: Number of passed checks
+    value: ${{ steps.probe.outputs.passed }}
+  failed:
+    description: Number of failed MUST checks
+    value: ${{ steps.probe.outputs.failed }}
+  warnings:
+    description: Number of SHOULD warnings
+    value: ${{ steps.probe.outputs.warnings }}
+runs:
+  using: composite
+  steps:
+    - id: probe
+      shell: bash
+      env:
+        PROBE_URL: ${{ inputs.url }}
+        PROBE_HEADERS: ${{ inputs.headers }}
+        PROBE_STRICT: ${{ inputs.strict }}
+        PROBE_TIMEOUT: ${{ inputs.timeout }}
+        PROBE_VERSION: ${{ inputs.version }}
+        PROBE_CLI: ${{ inputs.cli }}
+      run: |
+        args=("$PROBE_URL" --json --timeout "$PROBE_TIMEOUT")
+        [ "$PROBE_STRICT" = "true" ] && args+=(--strict)
+        while IFS= read -r line; do
+          [ -n "$line" ] && args+=(-H "$line")
+        done <<< "$PROBE_HEADERS"
+        set +e
+        if [ -n "$PROBE_CLI" ]; then
+          node "$PROBE_CLI" "${args[@]}" > "$RUNNER_TEMP/mcp-probe.json"
+        else
+          npx --yes "mcp-http-probe@${PROBE_VERSION}" "${args[@]}" > "$RUNNER_TEMP/mcp-probe.json"
+        fi
+        code=$?
+        set -e
+        node "$GITHUB_ACTION_PATH/scripts/summary.mjs" "$RUNNER_TEMP/mcp-probe.json"
+        exit $code
