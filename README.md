@@ -108,4 +108,6 @@ npm test         # runs against a reference SDK server, an origin-unsafe server 
 npm run build    # emits dist/
 ```
 
+Releases are published from CI with npm trusted publishing and provenance. Bump `version` in `package.json`, commit, then push a matching tag (`git tag v1.0.1 && git push --tags`). The workflow publishes to npm, creates the GitHub release and moves the `v1` tag.
+
 MIT licensed. It began as part of [Hearth](https://github.com/Chinmay-92/hearth), an Alexa+ caregiving MCP server, for the Amazon *Build, Ship, Shape* hackathon.
