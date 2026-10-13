@@ -1,5 +1,5 @@
 name: MCP HTTP Probe
-description: Check an MCP server against the Streamable HTTP transport rules of spec 2025-11-25 (Origin/DNS rebinding, sessions, protocol version, tool schemas).
+description: Check an MCP server against the Streamable HTTP transport rules (Origin/DNS rebinding, sessions, protocol version)
 author: Chinmay Pingale
 branding:
   icon: check-circle
