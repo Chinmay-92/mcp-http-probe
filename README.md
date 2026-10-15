@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/mcp-http-probe?color=e46a2e)](https://www.npmjs.com/package/mcp-http-probe)
 [![ci](https://github.com/Chinmay-92/mcp-http-probe/actions/workflows/ci.yml/badge.svg)](https://github.com/Chinmay-92/mcp-http-probe/actions/workflows/ci.yml)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-mcp--http--probe-2ea44f?logo=github)](https://github.com/marketplace/actions/mcp-http-probe)
 [![MCP spec](https://img.shields.io/badge/MCP-2025--11--25-4a78a8)](https://modelcontextprotocol.io/specification/2025-11-25)
 [![license](https://img.shields.io/github/license/Chinmay-92/mcp-http-probe)](LICENSE)
 
@@ -69,7 +70,7 @@ The exit code is `1` if any MUST check fails, or any SHOULD check with `--strict
 
 ## GitHub Action
 
-Gate pull requests on spec conformance. The action writes a results table to the job summary and annotates failures.
+Gate pull requests on spec conformance. The action writes a results table to the job summary and annotates failures. It is listed on the [GitHub Marketplace](https://github.com/marketplace/actions/mcp-http-probe).
 
 ```yaml
 - run: node server.js &            # start your MCP server
